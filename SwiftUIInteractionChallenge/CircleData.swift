@@ -13,3 +13,9 @@ struct CircleData: Identifiable {
     let coordinate: (x: CGFloat, y: CGFloat)
     let radius: CGFloat
 }
+
+extension CircleData: Equatable {
+    static func == (lhs: CircleData, rhs: CircleData) -> Bool {
+        lhs.id == rhs.id
+    }
+}

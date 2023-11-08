@@ -12,6 +12,7 @@
 		6381E85C2AFB30E900132573 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6381E85B2AFB30E900132573 /* Assets.xcassets */; };
 		6381E85F2AFB30E900132573 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6381E85E2AFB30E900132573 /* Preview Assets.xcassets */; };
 		6381E8662AFB310F00132573 /* CircleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6381E8652AFB310F00132573 /* CircleData.swift */; };
+		6381E86C2AFB331A00132573 /* BackgroundBlurringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6381E86B2AFB331A00132573 /* BackgroundBlurringView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		6381E85B2AFB30E900132573 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6381E85E2AFB30E900132573 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		6381E8652AFB310F00132573 /* CircleData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleData.swift; sourceTree = "<group>"; };
+		6381E86B2AFB331A00132573 /* BackgroundBlurringView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundBlurringView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +55,7 @@
 		6381E8562AFB30E600132573 /* SwiftUIInteractionChallenge */ = {
 			isa = PBXGroup;
 			children = (
+				6381E86D2AFB331C00132573 /* Helper */,
 				6381E8572AFB30E600132573 /* SwiftUIInteractionChallengeApp.swift */,
 				6381E8592AFB30E600132573 /* ContentView.swift */,
 				6381E8652AFB310F00132573 /* CircleData.swift */,
@@ -68,6 +71,14 @@
 				6381E85E2AFB30E900132573 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		6381E86D2AFB331C00132573 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				6381E86B2AFB331A00132573 /* BackgroundBlurringView.swift */,
+			);
+			path = Helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +154,7 @@
 				6381E8662AFB310F00132573 /* CircleData.swift in Sources */,
 				6381E85A2AFB30E600132573 /* ContentView.swift in Sources */,
 				6381E8582AFB30E600132573 /* SwiftUIInteractionChallengeApp.swift in Sources */,
+				6381E86C2AFB331A00132573 /* BackgroundBlurringView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
