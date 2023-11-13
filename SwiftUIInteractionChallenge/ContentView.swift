@@ -33,6 +33,8 @@ struct ContentView: View {
 
     let widthUnit: CGFloat = 400
     
+    @State var circlePadding: CGFloat = 50
+    @State var isSheetDragging = false
     @State var showItem: CircleData?
     @Namespace var animation
     
@@ -52,14 +54,11 @@ struct ContentView: View {
                     .zIndex(ZIndex.middle.rawValue)
                 
                 detailView(data: item)
-                    .onTapGesture {
-                        self.showItem = nil
-                    }
-                    .padding(.horizontal, 30)
                     .zIndex(ZIndex.high.rawValue)
             }
         }
-        .animation(.easeInOut(duration: 1.5), value: showItem)
+        .animation(.spring, value: showItem)
+        .animation(isSheetDragging ? nil : .spring, value: circlePadding)
     }
     
     func circleItem(data: CircleData) -> some View {
@@ -76,12 +75,34 @@ struct ContentView: View {
     }
     
     func detailView(data: CircleData) -> some View {
-        Circle()
-            .foregroundStyle(.blue)
-            .overlay {
-                Text(data.label).font(.title)
+        VStack(alignment: .center) {
+            Circle()
+                .foregroundStyle(.blue)
+                .overlay {
+                    Text(data.label).font(.title)
+                }
+                .matchedGeometryEffect(id: data.id.uuidString, in: animation)
+                .frame(
+                    width: max(150, widthUnit - circlePadding),
+                    height: max(150, widthUnit - circlePadding))
+                .onTapGesture {
+                    self.showItem = nil
+                }
+            
+            Spacer().frame(minHeight: 5, maxHeight: 30)
+            
+            CustomBottomSheet(
+                sheetHeightOffset: $circlePadding,
+                isSheetDragging: $isSheetDragging,
+                onDismiss: { showItem = nil }
+            ) {
+                ScrollView {
+                    ForEach(0..<10) { Text("\($0)") }
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                }
             }
-            .matchedGeometryEffect(id: data.id.uuidString, in: animation)
+        }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
     
     private enum ZIndex: CGFloat {
@@ -90,6 +111,138 @@ struct ContentView: View {
         case low = 0
     }
 }
+
+struct CustomBottomSheet<Content>: View where Content: View {
+    @Binding var sheetHeightOffset: CGFloat
+    @Binding var isSheetDragging: Bool
+    
+    @State private var sheetPosition: SheetPosition = .middle
+    
+    let content: Content
+    let onDismiss: () -> Void
+    let defaultOffset: CGFloat
+    
+    init(
+        sheetHeightOffset: Binding<CGFloat>,
+        isSheetDragging: Binding<Bool>,
+        defaultOffset: CGFloat = 50,
+        onDismiss: @escaping () -> Void,
+        @ViewBuilder content: () -> Content)
+    {
+        self._sheetHeightOffset = sheetHeightOffset
+        self._isSheetDragging = isSheetDragging
+        self.onDismiss = onDismiss
+        self.content = content()
+        
+        self.defaultOffset = defaultOffset
+        self.sheetHeightOffset = defaultOffset
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            VStack {
+                self.handle()
+                    .padding(.vertical, 7)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                isSheetDragging = true
+                                sheetHeightOffset -= value.translation.height
+                            }
+                            .onEnded(onDragEnded)
+                    )
+                
+                self.content
+                
+                Spacer()
+            }
+            .frame(
+                width: geometry.size.width,
+                height: geometry.size.height
+            )
+            .background {
+                RoundedRectangle(cornerRadius: 25.0, style: .continuous)
+                    .foregroundColor(.white)
+                    .shadow(radius: 10)
+            }
+            
+        }
+        .edgesIgnoringSafeArea(.all)
+    }
+    
+    private func handle() -> some View {
+        Capsule()
+            .foregroundColor(.gray.opacity(0.7))
+            .frame(width: 100, height: 5)
+    }
+    
+    func onDragEnded(_ value: DragGesture.Value) {
+        defer { isSheetDragging = false }
+        
+        let velocity = CGSize(
+            width:  value.predictedEndLocation.x - value.location.x,
+            height: value.predictedEndLocation.y - value.location.y
+        ).height
+        
+        let velocityThreshold: CGFloat = 100
+        switch velocity {
+        case _ where velocity > velocityThreshold:
+            sheetPosition = sheetPosition.previous()
+        case _ where velocity < -velocityThreshold:
+            sheetPosition = sheetPosition.next()
+        default:
+            sheetPosition = .middle
+        }
+        
+        sheetHeightOffset = sheetPosition.position + defaultOffset
+        
+        if case .dismiss = sheetPosition { onDismiss() }
+    }
+    
+    enum SheetPosition: CaseIterable {
+        case dismiss
+        case middle
+        case high
+        
+        var position: CGFloat {
+            switch self {
+            case .high:
+                return 200
+            case .middle:
+                return 0
+            case .dismiss:
+                return 0
+            }
+        }
+    }
+}
+
+extension CaseIterable where Self: Equatable, AllCases: BidirectionalCollection {
+    func previous() -> Self {
+        let all = Self.allCases
+        let idx = all.firstIndex(of: self)!
+        let previous = all.index(before: idx)
+        
+        if idx == all.startIndex {
+            return self
+        } else {
+            return all[previous]
+        }
+    }
+
+    func next() -> Self {
+        let all = Self.allCases
+        let idx = all.firstIndex(of: self)!
+        let next = all.index(after: idx)
+        
+        if next == all.endIndex {
+            return self
+        } else {
+            return all[next]
+        }
+    }
+}
+
 
 #Preview {
     ContentView()
